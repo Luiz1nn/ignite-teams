@@ -1,17 +1,15 @@
-import { TouchableOpacity } from 'react-native'
+import { TouchableHighlightProps } from 'react-native'
 import { Container, Icon, Title } from './styles'
 
-type Props = {
+type Props = TouchableHighlightProps & {
   title: string
 }
 
-export function GroupCard({ title }: Props) {
+export function GroupCard({ title, ...rest }: Props) {
   return (
-    <TouchableOpacity>
-      <Container>
-        <Icon />
-        <Title>{title}</Title>
-      </Container>
-    </TouchableOpacity>
+    <Container {...rest}>
+      <Icon />
+      <Title>{title}</Title>
+    </Container>
   )
 }
