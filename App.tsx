@@ -7,7 +7,7 @@ import {
 } from '@expo-google-fonts/roboto'
 
 import theme from './src/theme'
-import { NewGroup } from '@/screens'
+import { Players } from '@/screens'
 import { Loading } from '@/components'
 import { StatusBar } from 'react-native'
 
@@ -21,7 +21,7 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <NewGroup /> : <Loading />}
+      {fontsLoaded ? <Players /> : <Loading />}
     </ThemeProvider>
   )
 }
