@@ -1,5 +1,5 @@
-import { ButtonIcon, Header, Highlight } from '@/components'
-import { Container } from './styles'
+import { ButtonIcon, Header, Highlight, Input } from '@/components'
+import { Container, Form } from './styles'
 
 export function Players() {
   return (
@@ -11,7 +11,10 @@ export function Players() {
         subtitle="adicione a galera e separe os times"
       />
 
-      <ButtonIcon />
+      <Form>
+        <Input placeholder="Nome da pessoa" autoCorrect={false} />
+        <ButtonIcon icon="add" />
+      </Form>
     </Container>
   )
 }
