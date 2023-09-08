@@ -1,6 +1,14 @@
-import { FlatList } from 'react-native'
-import { useState } from 'react'
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useRef, useState } from 'react'
+import { Alert, FlatList, TextInput } from 'react-native'
 import { useRoute } from '@react-navigation/native'
+import {
+  PlayerStorageDTO,
+  playerAddByGroup,
+  playersGetByGroupAndTeam,
+} from '@/storage'
+import { AppError } from '@/utils'
+import { PlayersAlert } from './PlayersAlert'
 import {
   Button,
   ButtonIcon,
@@ -19,11 +27,58 @@ type RouteParams = {
 
 export function Players() {
   const [team, setTeam] = useState('Time A')
-  const [players, setPlayers] = useState(['Luis', 'Fernando'])
+  const [newPlayerName, setNewPlayerName] = useState('')
+  const [players, setPlayers] = useState<PlayerStorageDTO[]>([])
+
+  const newPlayerNameInputRef = useRef<TextInput>(null)
 
   const route = useRoute()
 
   const { group } = route.params as RouteParams
+
+  async function handleAddPlayer() {
+    if (newPlayerName.trim().length === 0) {
+      return PlayersAlert('Informe o nome da pessoa para adicionar.')
+    }
+
+    const newPlayer = {
+      name: newPlayerName,
+      team,
+    }
+
+    try {
+      await playerAddByGroup(newPlayer, group)
+
+      newPlayerNameInputRef.current?.blur()
+
+      setNewPlayerName('')
+      fetchPlayersByTeam()
+    } catch (error) {
+      if (error instanceof AppError) {
+        PlayersAlert(error.message)
+      } else {
+        PlayersAlert('Não foi possivel adicionar.')
+        console.log(error)
+      }
+    }
+  }
+
+  async function fetchPlayersByTeam() {
+    try {
+      const playersByTeam = await playersGetByGroupAndTeam(group, team)
+      setPlayers(playersByTeam)
+    } catch (error) {
+      console.log(error)
+      Alert.alert(
+        'Pessoas',
+        'Não foi possível carregar as pessoas do time selecionado.',
+      )
+    }
+  }
+
+  useEffect(() => {
+    fetchPlayersByTeam()
+  }, [team])
 
   return (
     <Container>
@@ -32,8 +87,15 @@ export function Players() {
       <Highlight title={group} subtitle="adicione a galera e separe os times" />
 
       <Form>
-        <Input placeholder="Nome da pessoa" autoCorrect={false} />
-        <ButtonIcon icon="add" />
+        <Input
+          placeholder="Nome da pessoa"
+          value={newPlayerName}
+          onChangeText={setNewPlayerName}
+          onSubmitEditing={handleAddPlayer}
+          autoCorrect={false}
+          returnKeyType="done"
+        />
+        <ButtonIcon icon="add" onPress={handleAddPlayer} />
       </Form>
 
       <HeaderList>
@@ -55,8 +117,8 @@ export function Players() {
 
       <FlatList
         data={players}
-        keyExtractor={(item) => item}
-        renderItem={({ item }) => <PlayerCard name={item} />}
+        keyExtractor={(item) => item.name}
+        renderItem={({ item }) => <PlayerCard name={item.name} />}
         ListEmptyComponent={() => (
           <ListEmpty message="Não há pessoas nesse time" />
         )}
