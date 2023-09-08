@@ -1,7 +1,7 @@
+import { useState } from 'react'
+import { useNavigation } from '@react-navigation/native'
 import { Button, Header, Highlight, Input } from '@/components'
 import { Container, Content, Icon } from './styles'
-import { useNavigation } from '@react-navigation/native'
-import { useState } from 'react'
 
 export function NewGroup() {
   const [group, setGroup] = useState('')
