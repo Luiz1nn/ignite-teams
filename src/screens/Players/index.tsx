@@ -5,6 +5,7 @@ import { useRoute } from '@react-navigation/native'
 import {
   PlayerStorageDTO,
   playerAddByGroup,
+  playerRemoveByGroup,
   playersGetByGroupAndTeam,
 } from '@/storage'
 import { AppError } from '@/utils'
@@ -76,6 +77,18 @@ export function Players() {
     }
   }
 
+  async function handlePlayerRemove(playerName: string) {
+    try {
+      await playerRemoveByGroup(playerName, group)
+
+      fetchPlayersByTeam()
+    } catch (error) {
+      console.log(error)
+
+      Alert.alert('Remover pessoa', 'Não foi possível remove essa pessoa.')
+    }
+  }
+
   useEffect(() => {
     fetchPlayersByTeam()
   }, [team])
@@ -118,7 +131,12 @@ export function Players() {
       <FlatList
         data={players}
         keyExtractor={(item) => item.name}
-        renderItem={({ item }) => <PlayerCard name={item.name} />}
+        renderItem={({ item }) => (
+          <PlayerCard
+            name={item.name}
+            onRemove={() => handlePlayerRemove(item.name)}
+          />
+        )}
         ListEmptyComponent={() => (
           <ListEmpty message="Não há pessoas nesse time" />
         )}
